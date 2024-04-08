@@ -38,8 +38,8 @@ func main() {
 			break
 		}
 
-		if i%1000000 == 0 {
-			logrus.Info("Finding in section: ", i, " - ", i+1000000)
+		if i%10000000 == 0 {
+			logrus.Info("Finding in section: ", i, " - ", i+10000000)
 		}
 	}
 
