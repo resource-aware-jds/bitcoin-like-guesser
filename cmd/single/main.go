@@ -37,6 +37,10 @@ func main() {
 			isWin = res
 			break
 		}
+
+		if i%1000 == 0 {
+			logrus.Info("Finding in section: ", i, " - ", i+1000)
+		}
 	}
 
 	logrus.Info("IsWin!: ", isWin)
