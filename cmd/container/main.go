@@ -59,6 +59,7 @@ func main() {
 				logrus.Error("Check round failed", err)
 			}
 			if hasWinner {
+				logrus.Info("Already got the winner for this round. Breaking!")
 				break
 			}
 		}
