@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bitcoin-like-guesser/pkg/httpclient"
 	"bitcoin-like-guesser/pkg/logic"
+	"encoding/json"
 	containerlib "github.com/resource-aware-jds/container-lib"
 	"github.com/resource-aware-jds/container-lib/model"
 	"github.com/resource-aware-jds/container-lib/pkg/containerlibcontext"
@@ -20,27 +22,48 @@ type TaskData struct {
 
 func main() {
 	containerlib.Run(func(ctx containerlibcontext.Context, task model.Task) error {
-		// TODO: Marshal task attribute into TaskData
+		var data TaskData
+		err := json.Unmarshal(task.Attributes, &data)
+		if err != nil {
+			logrus.Error(err)
+			return err
+		}
 
-		// TODO: Provide HTTPClient
+		client := httpclient.ProvideHTTPClient(httpclient.HTTPConfig{
+			Endpoint: data.Endpoint,
+			NodeID:   data.NodeID,
+			RoundID:  data.RoundID,
+		})
 
-		for i := 0; i < 1000000000; i++ {
+		isWin := false
+		for i := data.Start; i < data.End; i++ {
 			iStr := strconv.Itoa(i)
 			result := logic.GenerateBase64Hash(iStr)
 
-			// TODO: Use from TaskData
-			if result == cfg.ExpectedHash {
+			if result == data.ExpectedHash {
 				// Guess the answer
 				res, err := client.GuessAnswer(iStr)
 				if err != nil {
 					logrus.Error("Guess Answer incorrect!: ", err)
-					return
+					continue
 				}
 				isWin = res
 				break
 			}
+
+			if i%1000 != 0 {
+				continue
+			}
+			hasWinner, err := client.CheckRound()
+			if err != nil {
+				logrus.Error("Check round failed", err)
+			}
+			if hasWinner {
+				break
+			}
 		}
 
+		logrus.Info("IsWin!: ", isWin)
 		ctx.Success()
 		return nil
 	})
