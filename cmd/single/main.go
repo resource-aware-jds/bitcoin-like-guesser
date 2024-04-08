@@ -39,7 +39,7 @@ func main() {
 		}
 
 		if i%1000000 == 0 {
-			logrus.Info("Finding in section: ", i, " - ", i+1000)
+			logrus.Info("Finding in section: ", i, " - ", i+1000000)
 		}
 	}
 
